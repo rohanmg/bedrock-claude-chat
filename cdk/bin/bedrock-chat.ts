@@ -7,12 +7,21 @@ import { FrontendWafStack } from "../lib/frontend-waf-stack";
 const app = new cdk.App();
 
 const BEDROCK_REGION = app.node.tryGetContext("bedrockRegion");
+
+// Allowed IP address ranges for this app itself
 const ALLOWED_IP_V4_ADDRESS_RANGES: string[] = app.node.tryGetContext(
   "allowedIpV4AddressRanges"
 );
 const ALLOWED_IP_V6_ADDRESS_RANGES: string[] = app.node.tryGetContext(
   "allowedIpV6AddressRanges"
 );
+
+// Allowed IP address ranges for the published API
+const PUBLISHED_API_ALLOWED_IP_V4_ADDRESS_RANGES: string[] =
+  app.node.tryGetContext("publishedApiAllowedIpV4AddressRanges");
+const PUBLISHED_API_ALLOWED_IP_V6_ADDRESS_RANGES: string[] =
+  app.node.tryGetContext("publishedApiAllowedIpV6AddressRanges");
+
 const ENABLE_USAGE_ANALYSIS: boolean = app.node.tryGetContext(
   "enableUsageAnalysis"
 );
@@ -28,8 +37,9 @@ const ENABLE_USAGE_ANALYSIS: boolean = app.node.tryGetContext(
 //   allowedIpV6AddressRanges: ALLOWED_IP_V6_ADDRESS_RANGES,
 // });
 
-new BedrockChatStack(app, `BedrockChatStack`, {
+const chat = new BedrockChatStack(app, `BedrockChatStack`, {
   env: {
+    // account: process.env.CDK_DEFAULT_ACCOUNT,
     region: process.env.CDK_DEFAULT_REGION,
     account: process.env.CDK_DEFAULT_ACCOUNT,
   },
@@ -37,4 +47,9 @@ new BedrockChatStack(app, `BedrockChatStack`, {
   bedrockRegion: BEDROCK_REGION,
   // webAclId: waf.webAclArn.value,
   enableUsageAnalysis: ENABLE_USAGE_ANALYSIS,
+  publishedApiAllowedIpV4AddressRanges:
+    PUBLISHED_API_ALLOWED_IP_V4_ADDRESS_RANGES,
+  publishedApiAllowedIpV6AddressRanges:
+    PUBLISHED_API_ALLOWED_IP_V6_ADDRESS_RANGES,
 });
+chat.addDependency(waf);
