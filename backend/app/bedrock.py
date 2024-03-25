@@ -59,10 +59,10 @@ def get_model_id(model: str) -> str:
         return "anthropic.claude-v2"
     elif model == "claude-instant-v1":
         return "anthropic.claude-instant-v1"
-    elif model == "claude-v3-sonnet":
-        return "anthropic.claude-3-sonnet-20240229-v1:0"
-    elif model == "claude-v3-haiku":
-        return "anthropic.claude-3-haiku-20240307-v1:0"
+    # elif model == "claude-v3-sonnet":
+    #     return "anthropic.claude-3-sonnet-20240229-v1:0"
+    # elif model == "claude-v3-haiku":
+    #     return "anthropic.claude-3-haiku-20240307-v1:0"
     else:
         raise NotImplementedError()
 
@@ -71,7 +71,8 @@ def calculate_query_embedding(question: str) -> list[float]:
     model_id = EMBEDDING_CONFIG["model_id"]
 
     # Currently only supports "cohere.embed-multilingual-v3"
-    assert model_id == "cohere.embed-multilingual-v3"
+    # assert model_id == "cohere.embed-multilingual-v3"
+    assert model_id == "amazon.titan-embed-text-v1"
 
     payload = json.dumps({"texts": [question], "input_type": "search_query"})
     accept = "application/json"
@@ -104,7 +105,8 @@ def calculate_document_embeddings(documents: list[str]) -> list[list[float]]:
     model_id = EMBEDDING_CONFIG["model_id"]
 
     # Currently only supports "cohere.embed-multilingual-v3"
-    assert model_id == "cohere.embed-multilingual-v3"
+    # assert model_id == "cohere.embed-multilingual-v3"
+    assert model_id == "amazon.titan-embed-text-v1"
 
     embeddings = []
     for i in range(0, len(documents), BATCH_SIZE):

@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y \
     libglib2.0-0 \
     # unstructured package requirements for file type detection
     libmagic-mgc libmagic1 \
+    python3-pil tesseract-ocr libtesseract-dev tesseract-ocr-eng tesseract-ocr-script-latn \
     && rm -rf /var/lib/apt/lists/*
 
 # Playwright dependencies

@@ -17,11 +17,11 @@ pip install -r ./requirements.txt
 - Configure environment variables
 
 ```sh
-export TABLE_NAME=BedrockChatStack-DatabaseConversationTablexxxx
-export ACCOUNT=yyyy
-export REGION=ap-northeast-1
+export TABLE_NAME=BedrockChatStack-DatabaseConversationTable057281404408
+export ACCOUNT=057281404408
+export REGION=ap-southeast-2
 export BEDROCK_REGION=us-east-1
-export DOCUMENT_BUCKET=bedrockchatstack-documentbucketxxxxxxx
+export DOCUMENT_BUCKET=bedrockchatstack-documentbucket057281404408
 ```
 
 ## Launch local server
