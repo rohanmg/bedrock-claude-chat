@@ -24,15 +24,29 @@ export class VectorStore extends Construct {
   constructor(scope: Construct, id: string, props: VectorStoreProps) {
     super(scope, id);
 
-    const sg = new ec2.SecurityGroup(this, "ClusterSecurityGroup", {
-      vpc: props.vpc,
+    const sg = ["sg-0d9ce1da088b21911"];
+    const subnets = [
+        "subnet-0d923c6be1e118431",
+        "subnet-0057a0e4e6a0c98e2",
+        "subnet-01e7211d8f3d374c2",
+    ];
+
+    const selectedSubnets = props.vpc.selectSubnets({
+      subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+      subnetFilters: [ec2.SubnetFilter.byIds(subnets)],
     });
+
     const cluster = new rds.DatabaseCluster(this, "Cluster", {
       engine: rds.DatabaseClusterEngine.auroraPostgres({
         version: rds.AuroraPostgresEngineVersion.VER_15_3,
       }),
       vpc: props.vpc,
-      securityGroups: [sg],
+      securityGroups: sg.map((sgId, i) => 
+      ec2.SecurityGroup.fromSecurityGroupId(this, `SecurityGroup${i}`, sgId, {
+          mutable: false
+        })
+      ),
+      vpcSubnets: selectedSubnets,
       defaultDatabaseName: DB_NAME,
       enableDataApi: true,
       serverlessV2MinCapacity: 0.5,
@@ -49,6 +63,7 @@ export class VectorStore extends Construct {
 
     const setupHandler = new NodejsFunction(this, "CustomResourceHandler", {
       vpc: props.vpc,
+      vpcSubnets: selectedSubnets,
       runtime: lambda.Runtime.NODEJS_18_X,
       entry: path.join(
         __dirname,
@@ -78,10 +93,19 @@ export class VectorStore extends Construct {
       },
     });
 
-    sg.connections.allowFrom(
-      setupHandler,
-      ec2.Port.tcp(cluster.clusterEndpoint.port)
-    );
+    sg.forEach((sgId) => {
+      setupHandler.connections.allowFrom(
+        ec2.SecurityGroup.fromSecurityGroupId(this, "SecurityGroup", sgId, {
+          mutable: false,
+        }),
+        ec2.Port.tcp(cluster.clusterEndpoint.port)
+      )
+    });
+
+    // sg.connections.allowFrom(
+    //   setupHandler,
+    //   ec2.Port.tcp(cluster.clusterEndpoint.port)
+    // );
 
     const cr = new CustomResource(this, "CustomResourceSetup", {
       serviceToken: setupHandler.functionArn,
@@ -93,7 +117,7 @@ export class VectorStore extends Construct {
     });
     cr.node.addDependency(cluster);
 
-    this.securityGroup = sg;
+    this.securityGroup = cluster.connections.securityGroups[0];
     this.cluster = cluster;
     this.secret = cluster.secret!;
   }

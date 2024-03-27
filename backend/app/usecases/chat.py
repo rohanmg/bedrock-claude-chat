@@ -314,8 +314,8 @@ def propose_conversation_title(
     user_id: str,
     conversation_id: str,
     model: Literal[
-        "claude-instant-v1", "claude-v2", "claude-v3-sonnet", "claude-v3-haiku"
-    ] = "claude-v3-haiku",
+        "claude-instant-v1", "claude-v2", # "claude-v3-sonnet", "claude-v3-haiku"
+    ] = "claude-v2",
 ) -> str:
     PROMPT = """Reading the conversation above, what is the appropriate title for the conversation? When answering the title, please follow the rules below:
 <rules>
@@ -328,6 +328,11 @@ def propose_conversation_title(
     # Fetch existing conversation
     conversation = find_conversation_by_id(user_id, conversation_id)
 
+    # Omit image (claude instant v1 / v2 don't support image content type)
+    # TODO: Remove this when claude v3 haiku is supported
+    for message in conversation.message_map.values():
+        message.content = [c for c in message.content if c.content_type != "image"]
+    
     messages = trace_to_root(
         node_id=conversation.last_message_id,
         message_map=conversation.message_map,

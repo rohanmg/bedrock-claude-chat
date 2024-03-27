@@ -23,7 +23,7 @@ import { VpcConfig } from "./api-publishment-stack";
 
 export interface BedrockChatStackProps extends StackProps {
   readonly bedrockRegion: string;
-  readonly webAclId: string;
+  // readonly webAclId: string;
   readonly enableUsageAnalysis: boolean;
   readonly publishedApiAllowedIpV4AddressRanges: string[];
   readonly publishedApiAllowedIpV6AddressRanges: string[];
@@ -36,7 +36,11 @@ export class BedrockChatStack extends cdk.Stack {
       ...props,
     });
 
-    const vpc = new ec2.Vpc(this, "VPC", {});
+    const vpc = ec2.Vpc.fromLookup(this, "Vpc", {
+      isDefault: false,
+      vpcId: "vpc-0a88144b111909eac",      
+    });
+
     const vectorStore = new VectorStore(this, "VectorStore", {
       vpc: vpc,
     });
@@ -135,7 +139,7 @@ export class BedrockChatStack extends cdk.Stack {
       webSocketApiEndpoint: websocket.apiEndpoint,
       auth,
       accessLogBucket,
-      webAclId: props.webAclId,
+      // webAclId: props.webAclId,
     });
     documentBucket.addCorsRule({
       allowedMethods: [HttpMethods.PUT],

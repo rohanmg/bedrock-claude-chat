@@ -8,13 +8,17 @@ const availableModels: {
   supportMediaType: string[];
 }[] = [
   {
-    modelId: 'claude-v3-haiku',
-    label: 'Claude 3 (Haiku)',
+    // modelId: 'claude-v3-haiku',
+    // label: 'Claude 3 (Haiku)',
+    modelId: 'claude-v2',
+    label: 'Claude',
     supportMediaType: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
   },
   {
-    modelId: 'claude-v3-sonnet',
-    label: 'Claude 3 (Sonnet)',
+    // modelId: 'claude-v3-sonnet',
+    // label: 'Claude 3 (Sonnet)',
+    modelId: 'claude-instant-v1',
+    label: 'Claude Instant',
     supportMediaType: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
   },
 ];

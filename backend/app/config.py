@@ -29,7 +29,8 @@ GENERATION_CONFIG: GenerationConfig = {
 # Configure embedding parameter.
 EMBEDDING_CONFIG: EmbeddingConfig = {
     # DO NOT change `model_id` (currently other models are not supported)
-    "model_id": "cohere.embed-multilingual-v3",
+    # "model_id": "cohere.embed-multilingual-v3",
+    "model_id": "amazon.titan-embed-text-v1",
     # NOTE: consider that cohere allows up to 2048 tokens per request
     "chunk_size": 1000,
     "chunk_overlap": 200,

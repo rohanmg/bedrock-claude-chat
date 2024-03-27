@@ -85,10 +85,10 @@ def get_model_id(model: str) -> str:
         return "anthropic.claude-v2:1"
     elif model == "claude-instant-v1":
         return "anthropic.claude-instant-v1"
-    elif model == "claude-v3-sonnet":
-        return "anthropic.claude-3-sonnet-20240229-v1:0"
-    elif model == "claude-v3-haiku":
-        return "anthropic.claude-3-haiku-20240307-v1:0"
+    # elif model == "claude-v3-sonnet":
+    #     return "anthropic.claude-3-sonnet-20240229-v1:0"
+    # elif model == "claude-v3-haiku":
+    #     return "anthropic.claude-3-haiku-20240307-v1:0"
     else:
         raise NotImplementedError()
 
@@ -97,9 +97,10 @@ def calculate_query_embedding(question: str) -> list[float]:
     model_id = EMBEDDING_CONFIG["model_id"]
 
     # Currently only supports "cohere.embed-multilingual-v3"
-    assert model_id == "cohere.embed-multilingual-v3"
+    # assert model_id == "cohere.embed-multilingual-v3"
+    assert model_id == "amazon.titan-embed-text-v1"
 
-    payload = json.dumps({"texts": [question], "input_type": "search_query"})
+    payload = json.dumps({"inputText": question})#, "input_type": "search_query"})
     accept = "application/json"
     content_type = "application/json"
 
@@ -112,9 +113,47 @@ def calculate_query_embedding(question: str) -> list[float]:
     return embedding
 
 
+# def calculate_document_embeddings(documents: list[str]) -> list[list[float]]:
+#     def _calculate_document_embeddings(documents: str) -> list[float]:
+#         print(documents)
+#         payload = json.dumps({"inputText": " ".join(documents)})#, "input_type": "search_document"})
+#         accept = "application/json"
+#         content_type = "application/json"
+
+#         response = client.invoke_model(
+#             accept=accept, contentType=content_type, body=payload, modelId=model_id
+#         )
+#         output = json.loads(response.get("body").read())
+#         embeddings = output.get("embeddings")
+
+#         return embeddings
+
+#     BATCH_SIZE = 10
+#     model_id = EMBEDDING_CONFIG["model_id"]
+
+#     # Currently only supports "cohere.embed-multilingual-v3"
+#     # assert model_id == "cohere.embed-multilingual-v3"
+#     assert model_id == "amazon.titan-embed-text-v1"
+
+#     embeddings = []
+#     for i in range(0, len(documents), BATCH_SIZE):
+#         # Split documents into batches to avoid exceeding the payload size limit
+#         batch = documents[i : i + BATCH_SIZE]
+#         embeddings += _calculate_document_embeddings(batch)
+
+#         embeddings.extend(embeddings)
+
+#     return embeddings
+
+
 def calculate_document_embeddings(documents: list[str]) -> list[list[float]]:
-    def _calculate_document_embeddings(documents: list[str]) -> list[list[float]]:
-        payload = json.dumps({"texts": documents, "input_type": "search_document"})
+    BATCH_SIZE = 10
+    model_id = "amazon.titan-embed-text-v1"  # Use the Amazon Titan embedding model
+
+    embeddings = []
+    for i in range(0, len(documents), BATCH_SIZE):
+        batch = documents[i : i + BATCH_SIZE]
+        payload = json.dumps({"inputText": " ".join(batch)})
         accept = "application/json"
         content_type = "application/json"
 
@@ -122,20 +161,8 @@ def calculate_document_embeddings(documents: list[str]) -> list[list[float]]:
             accept=accept, contentType=content_type, body=payload, modelId=model_id
         )
         output = json.loads(response.get("body").read())
-        embeddings = output.get("embeddings")
+        batch_embeddings = output.get("embeddings")
 
-        return embeddings
-
-    BATCH_SIZE = 10
-    model_id = EMBEDDING_CONFIG["model_id"]
-
-    # Currently only supports "cohere.embed-multilingual-v3"
-    assert model_id == "cohere.embed-multilingual-v3"
-
-    embeddings = []
-    for i in range(0, len(documents), BATCH_SIZE):
-        # Split documents into batches to avoid exceeding the payload size limit
-        batch = documents[i : i + BATCH_SIZE]
-        embeddings += _calculate_document_embeddings(batch)
+        embeddings.extend(batch_embeddings)
 
     return embeddings
