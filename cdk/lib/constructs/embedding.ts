@@ -151,6 +151,11 @@ export class Embedding extends Construct {
         },
       })
     );
+    const subnets = [
+        "subnet-0d923c6be1e118431",
+        "subnet-0057a0e4e6a0c98e2",
+        "subnet-01e7211d8f3d374c2",
+    ];
     const pipe = new CfnPipe(this, "Pipe", {
       source: props.database.tableStreamArn!,
       sourceParameters: {
@@ -180,6 +185,7 @@ export class Embedding extends Construct {
               assignPublicIp: "DISABLED",
               subnets: props.vpc.selectSubnets({
                 subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+                subnetFilters: [ec2.SubnetFilter.byIds(subnets)],
               }).subnetIds,
               securityGroups: [taskSg.securityGroupId],
             },

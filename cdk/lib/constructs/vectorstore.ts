@@ -93,6 +93,15 @@ export class VectorStore extends Construct {
       },
     });
 
+    sg.forEach((sgId) => {
+      setupHandler.connections.allowFrom(
+        ec2.SecurityGroup.fromSecurityGroupId(this, "SecurityGroup", sgId, {
+          mutable: false,
+        }),
+        ec2.Port.tcp(cluster.clusterEndpoint.port)
+      )
+    });
+
     // sg.connections.allowFrom(
     //   setupHandler,
     //   ec2.Port.tcp(cluster.clusterEndpoint.port)

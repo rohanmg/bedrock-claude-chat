@@ -52,4 +52,4 @@ const chat = new BedrockChatStack(app, `BedrockChatStack`, {
   publishedApiAllowedIpV6AddressRanges:
     PUBLISHED_API_ALLOWED_IP_V6_ADDRESS_RANGES,
 });
-chat.addDependency(waf);
+// chat.addDependency(waf);

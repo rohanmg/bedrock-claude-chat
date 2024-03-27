@@ -2,7 +2,7 @@
   "vpc-provider:account=057281404408:filter.isDefault=false:filter.vpc-id=vpc-0a88144b111909eac:region=ap-southeast-2:returnAsymmetricSubnets=true": {
     "vpcId": "vpc-0a88144b111909eac",
     "vpcCidrBlock": "10.140.0.0/16",
-    "ownerAccountId": "645868319439",
+    "ownerAccountId": "057281404408",
     "availabilityZones": [],
     "subnetGroups": [
       {

@@ -109,6 +109,7 @@ const publishedApi = new ApiPublishmentStack(
   {
     env: {
       region: process.env.CDK_DEFAULT_REGION,
+      account: process.env.CDK_DEFAULT_ACCOUNT,
     },
     bedrockRegion: BEDROCK_REGION,
     vpcConfig: vpcConfig,

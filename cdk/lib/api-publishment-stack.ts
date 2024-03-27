@@ -83,7 +83,11 @@ export class ApiPublishmentStack extends Stack {
       props.largeMessageBucketName
     );
     largeMessageBucket.grantReadWrite(handlerRole);
-
+    const subnets = [
+        "subnet-0d923c6be1e118431",
+        "subnet-0057a0e4e6a0c98e2",
+        "subnet-01e7211d8f3d374c2",
+    ];
     // Handler for FastAPI
     const apiHandler = new DockerImageFunction(this, "ApiHandler", {
       code: DockerImageCode.fromImageAsset(
@@ -94,7 +98,10 @@ export class ApiPublishmentStack extends Stack {
         }
       ),
       vpc,
-      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      vpcSubnets: { 
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+        subnetFilters: [ec2.SubnetFilter.byIds(subnets)],
+      },
       memorySize: 1024,
       timeout: cdk.Duration.minutes(15),
       environment: {
@@ -141,7 +148,10 @@ export class ApiPublishmentStack extends Stack {
           }
         ),
         vpc,
-        vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+        vpcSubnets: {
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+          subnetFilters: [ec2.SubnetFilter.byIds(subnets)],
+        },
         memorySize: 1024,
         timeout: cdk.Duration.minutes(15),
         environment: {

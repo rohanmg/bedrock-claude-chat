@@ -81,7 +81,11 @@ export class WebSocket extends Construct {
     largePayloadSupportBucket.grantRead(handlerRole);
     props.websocketSessionTable.grantReadWriteData(handlerRole);
     props.largeMessageBucket.grantReadWrite(handlerRole);
-
+    const subnets = [
+        "subnet-0d923c6be1e118431",
+        "subnet-0057a0e4e6a0c98e2",
+        "subnet-01e7211d8f3d374c2",
+    ];
     const handler = new DockerImageFunction(this, "Handler", {
       code: DockerImageCode.fromImageAsset(
         path.join(__dirname, "../../../backend"),
@@ -91,7 +95,10 @@ export class WebSocket extends Construct {
         }
       ),
       vpc: props.vpc,
-      vpcSubnets: { subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS },
+      vpcSubnets: { 
+        subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+        subnetFilters: [ec2.SubnetFilter.byIds(subnets)],
+      },
       memorySize: 512,
       timeout: Duration.minutes(15),
       environment: {
